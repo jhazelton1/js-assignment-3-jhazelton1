@@ -5,26 +5,28 @@ import { chooseRandom, createPrompt, createQuestions } from './lib'
 
 describe('chooseRandom', () => {
   it('Should return an array', () => {
-    jsv.assertForall('array nat', (arr) => {
+    jsv.assertForall('array nat', arr => {
       return Array.isArray(chooseRandom(arr))
     })
   })
   it('Should not mutate the array', () => {
-    jsv.assertForall('array nat', (arr) => {
+    jsv.assertForall('array nat', arr => {
       const arrBefore = arr
       chooseRandom(arr)
       return arrBefore === arr
     })
   })
   it('Should return an array of the given numItems length (if provided)', () => {
-    jsv.assertForall('array nat', (arr) => {
+    jsv.assertForall('array nat', arr => {
       if (arr.length === 0 || arr.length === 1) {
         // Here the numItems value given to chooseRandom is irrelevent as
         // an array of length 0 or 1 should just return the given array
         // with no possibility of randomization.
-        return arr === chooseRandom(arr, 948672894968) &&
+        return (
+          arr === chooseRandom(arr, 948672894968) &&
           arr === chooseRandom(arr, 0) &&
           arr === chooseRandom(arr)
+        )
       }
       const random = chooseRandom(arr, 2)
       return random.length === 2
@@ -45,30 +47,38 @@ describe('createPrompt', () => {
     jsv.assert(() => createPrompt(undefined).length === 3, options)
   })
   it('Should default to 1 question and 2 choices', () => {
-    const prompts = [{
-      type: 'input',
-      name: 'question-1',
-      message: 'Enter question 1'
-    }, {
-      type: 'input',
-      name: 'question-1-choice-1',
-      message: 'Enter answer choice 1 for question 1'
-    }, {
-      type: 'input',
-      name: 'question-1-choice-2',
-      message: 'Enter answer choice 2 for question 1'
-    }]
+    const prompts = [
+      {
+        type: 'input',
+        name: 'question-1',
+        message: 'Enter question 1'
+      },
+      {
+        type: 'input',
+        name: 'question-1-choice-1',
+        message: 'Enter answer choice 1 for question 1'
+      },
+      {
+        type: 'input',
+        name: 'question-1-choice-2',
+        message: 'Enter answer choice 2 for question 1'
+      }
+    ]
     jsv.assert(() => {
-      return _.isEqual(createPrompt(), prompts) &&
+      return (
+        _.isEqual(createPrompt(), prompts) &&
         _.isEqual(createPrompt({}), prompts) &&
         _.isEqual(createPrompt(undefined), prompts)
+      )
     }, options)
   })
   it('Should always return an array of length numQuestions + (numQuestions * numChoices)', () =>
-    jsv.assertForall('{ numQuestions: nat; numChoices: nat }', (r) =>
-      createPrompt(r).length === (r.numQuestions + (r.numQuestions * r.numChoices))
-    )
-  )
+    jsv.assertForall(
+      '{ numQuestions: nat; numChoices: nat }',
+      r =>
+        createPrompt(r).length ===
+        r.numQuestions + r.numQuestions * r.numChoices
+    ))
 })
 
 describe('createQuestions', () => {
@@ -84,31 +94,29 @@ describe('createQuestions', () => {
     jsv.assert(() => createQuestions(undefined).length === 0, options)
   })
   it('Should return question objects with their corresponding question and choices', () =>
-    jsv.assertForall(jsv.record({
-      'question-1': jsv.string,
-      'question-1-choice-1': jsv.string,
-      'question-1-choice-2': jsv.string,
-      'question-2': jsv.string,
-      'question-2-choice-1': jsv.string,
-      'question-2-choice-2': jsv.string
-    }), (r) =>
-      _.isEqual(createQuestions(r), [{
-        type: 'list',
-        name: 'question-1',
-        message: r['question-1'],
-        choices: [
-          r['question-1-choice-1'],
-          r['question-1-choice-2']
-        ]
-      }, {
-        type: 'list',
-        name: 'question-2',
-        message: r['question-2'],
-        choices: [
-          r['question-2-choice-1'],
-          r['question-2-choice-2']
-        ]
-      }])
-    )
-  )
+    jsv.assertForall(
+      jsv.record({
+        'question-1': jsv.string,
+        'question-1-choice-1': jsv.string,
+        'question-1-choice-2': jsv.string,
+        'question-2': jsv.string,
+        'question-2-choice-1': jsv.string,
+        'question-2-choice-2': jsv.string
+      }),
+      r =>
+        _.isEqual(createQuestions(r), [
+          {
+            type: 'list',
+            name: 'question-1',
+            message: r['question-1'],
+            choices: [r['question-1-choice-1'], r['question-1-choice-2']]
+          },
+          {
+            type: 'list',
+            name: 'question-2',
+            message: r['question-2'],
+            choices: [r['question-2-choice-1'], r['question-2-choice-2']]
+          }
+        ])
+    ))
 })
