@@ -99,4 +99,10 @@ export const createQuestions = createQuestionsObject => {
   return createQuestionsArray
 }
 
+export default {
+  chooseRandom,
+  createPrompt,
+  createQuestions
+}
+
 // TODO export above functions
